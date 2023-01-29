@@ -9,7 +9,6 @@ const gallery = document.querySelector('.gallery');
 const btnLoadMore = document.querySelector('.load-more');
 let gallerySimpleLightbox = new SimpleLightbox('.gallery a');
 
-
 btnLoadMore.style.display = 'none';
 
 let pageNumber = 1;
@@ -19,16 +18,21 @@ btnSearch.addEventListener('click', e => {
   cleanGallery();
   const trimmedValue = input.value.trim();
   if (trimmedValue !== '') {
-    fetchImages(trimmedValue, pageNumber).then(foundData => {
-      if (foundData.hits.length === 0) {
+    fetchImages(trimmedValue, pageNumber).then(data => {
+      if (data.hits.length === 0) {
         Notiflix.Notify.failure(
           'Sorry, there are no images matching your search query. Please try again.'
         );
-      }else {
-        renderImageList(foundData.hits);
-        Notiflix.Notify.success(
-          `Hooray! We found ${foundData.totalHits} images.`
+      } 
+      if (data.hits.length < 40) {
+        renderImageList(data.hits);
+        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
+        Notiflix.Notify.failure(
+          `We're sorry, but you've reached the end of search results.`
         );
+      } else {
+        renderImageList(data.hits);
+        Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
         btnLoadMore.style.display = 'block';
         gallerySimpleLightbox.refresh();
       }
@@ -45,11 +49,16 @@ btnLoadMore.addEventListener('click', () => {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-    }else {
+    } else if (data.totalHits<=pageNumber*40) {
       renderImageList(data.hits);
-      Notiflix.Notify.success(
-        `Hooray! We found ${data.totalHits} images.`
+      btnSearch.hidden = true;
+      Notiflix.Notify.failure(
+        `We're sorry, but you've reached the end of search results.`
       );
+    }
+    else {
+      renderImageList(data.hits);
+      Notiflix.Notify.success(`Hooray! We found ${data.totalHits} images.`);
       btnLoadMore.style.display = 'block';
     }
   });
