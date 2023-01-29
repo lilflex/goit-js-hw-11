@@ -45,9 +45,6 @@ btnLoadMore.addEventListener('click', () => {
       Notiflix.Notify.failure(
         'Sorry, there are no images matching your search query. Please try again.'
       );
-    }else if (foundData.totalHits<=pageNumber*40) {
-      btnSearch.hidden = true;
-      Notiflix.Notify.failure(`We're sorry, but you've reached the end of search results.`)
     }else {
       renderImageList(data.hits);
       Notiflix.Notify.success(
